@@ -20,3 +20,4 @@ LassoRegression <- function(data, storeID, categoryID) {
   
   return(list(model = lassoModel, MSE = mean((predictionLasso - testY)^2)))
 }
+
