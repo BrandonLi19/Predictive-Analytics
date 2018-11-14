@@ -1,0 +1,22 @@
+library(tree)
+setwd("C:/Users/Xin Guan/Documents/500S/Final_Project")
+store_2=read.csv("Store2-1.csv", header = T)
+store_2 = na.omit(Store1)
+p1_s2x=store_2[,3:6]
+p1_s2y=store_2[,99]
+p1_s2=data.frame(p1_s2y,p1_s2x)
+set.seed(1)
+train=sample(1:nrow(p1_s2),247)
+tree.p1_s2=tree(p1_s2y~.,p1_s2,subset=train)
+plot(tree.p1_s2)
+text(tree.p1_s2,pretty=0)
+cv.p1_s2=cv.tree(tree.p1_s2)
+plot(cv.p1_s2$size,cv.p1_s2$dev,type='b')
+prune.p1_s2=prune.tree(tree.p1_s2,best=5)
+plot(prune.p1_s2)
+text(prune.p1_s2,pretty=0)
+yp1s2hat=predict(tree.p1_s2,newdata=p1_s2[-train,])
+p1_s2.test=p1_s2[-train,"p1_s2y"]
+plot(yp1s2hat,p1_s2.test)
+abline(0,1)
+mean((yp1s2hat-p1_s2.test)^2)
