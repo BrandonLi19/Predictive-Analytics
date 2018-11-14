@@ -1,28 +1,31 @@
-neuralNet <- function(data, storeID, categoryID) {
-  require(openxlsx)
-  require(neuralnet)
-  require(MASS)
-  require(magrittr)
+NeuralNet <- function(allData, storeID, categoryID) {
   
-  data %>% filter(StoreID == storeID) -> storeData
-  f <- function(x) {(x-min(x))/(max(x)-min(x))}
+  require(neuralnet)
+  require(dplyr)
+  
+  f <- function(x) {(x-min(x))/(max(x)-min(x))}  # Is this standardization?
+  # Ignore storeID since neural network requires huge amount of data
+  # allData %>% filter(StoreID == storeID) -> storeData
+  allData -> storeData
   storeData %>% filter(Random == 'Train') -> temptrain
   train <- as.data.frame(apply(temptrain[,c(3:122)],2,f)) 
   
   storeData %>% filter(Random == 'Test') -> temptest
   test <- as.data.frame(apply(temptest[,c(3:122)],2,f))
-  
-  train %>% select(matches('^[DPF].+$')) %>% as.matrix() -> trainX
-  train %>% select(paste0('Y', categoryID)) %>% as.matrix() -> trainY
-  
-  test %>% select(matches('^[DPF].+$')) %>% as.matrix() -> testX
-  test %>% select(paste0('Y', categoryID)) %>% as.matrix() -> testY
+
+  train %>% select(matches('^[DPF].+$')) -> trainX  # No need to cast as matrix
+  train %>% select(paste0('Y', categoryID)) -> trainY
+
+  test %>% select(matches('^[DPF].+$')) -> testX
+  test %>% select(paste0('Y', categoryID)) -> testY
 
   # Neural Network
-  nn <- neuralnet(trainY~trainX, data = train, linear.output = F, hidden = 2)
+  fml <- as.formula(paste(names(trainY), '~', paste(names(trainX), collapse = '+')))  # Build formula from string
+  
+  nn <- neuralnet(fml, data = train, linear.output = F, hidden = 2)  # Use formula as first parameter, not data sets
   #prediction
   pred <- compute(nn, testX)
-  pred$net.result
-  return(list(model = nn, RMSE = sqrt(mean((testY - pred$net.result) ^ 2))))
+  
+  return(list(model = nn, MSE = mean(unlist((testY - pred$net.result) ^ 2))))  # Need to unlist prediction result
 }
-neuralNet(allData, 3, 1)
+
