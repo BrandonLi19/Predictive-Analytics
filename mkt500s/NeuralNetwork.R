@@ -1,4 +1,4 @@
-NeuralNet <- function(allData, storeID, categoryID) {
+NeuralNetwork <- function(data, storeID, categoryID) {
   
   require(neuralnet)
   require(dplyr)
@@ -6,7 +6,7 @@ NeuralNet <- function(allData, storeID, categoryID) {
   f <- function(x) {(x-min(x))/(max(x)-min(x))}  # Is this standardization?
   # Ignore storeID since neural network requires huge amount of data
   # allData %>% filter(StoreID == storeID) -> storeData
-  allData -> storeData
+  data -> storeData
   storeData %>% filter(Random == 'Train') -> temptrain
   train <- as.data.frame(apply(temptrain[,c(3:122)],2,f)) 
   

@@ -3,7 +3,8 @@ RandomForest <- function(data, storeID, categoryID) {
   require(dplyr)
   require(randomForest)
   
-  data %>% filter(StoreID == storeID) -> storeData
+  # data %>% filter(StoreID == storeID) -> storeData
+  data -> storeData
   storeData %>% filter(Random == 'Train') -> train
   storeData %>% filter(Random == 'Test') -> test
   
@@ -29,6 +30,3 @@ RandomForest <- function(data, storeID, categoryID) {
   
   return(list(model = rf, MSE = mean((unlist(yhat - testY)^2))))
 }
-
-RandomForest(allData, 3, 1)
-
