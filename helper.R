@@ -1,14 +1,35 @@
+## finds all .R files within a folder and soruces them
+SourceEntireFolder <- function(folderName, verbose=FALSE, showWarnings=TRUE) { 
+  files <- list.files(folderName, full.names=TRUE)
+  
+  # Grab only R files
+  files <- files[ grepl("\\.[rR]$", files) ]
+  
+  if (!length(files) && showWarnings)
+    warning("No R files in ", folderName)
+  
+  for (f in files) {
+    if (verbose)
+      cat("sourcing: ", f, "\n")
+    ## TODO:  add caught whether error or not and return that
+    try(source(f, local=FALSE, echo=FALSE), silent=!verbose)
+  }
+  return(invisible(NULL))
+}
+
+
 # Concatenate store data and add an additional column StoreID ranging from 2 to 9
 AddIDColumn <- function(storeID) {
   return(cbind(dataList[[storeID]], StoreID = substr(storeID, 6, 6)))
 }
 
-DataPrep <- function(directory) {
+DataPrep <- function(directory='.') {
   # Read all xlsx workbooks
   require(readxl)
   require(dplyr)
   require(sqldf)
   
+  directory = '.'
   fileList <- list.files(path = directory, pattern = '*.xlsx')
   dataList <- sapply(fileList, read_xlsx, simplify = FALSE)
   names(dataList) <- tolower(substr(names(dataList), 1, 6))  # Rename list items to 'store2'-like
