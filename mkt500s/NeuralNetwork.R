@@ -5,21 +5,23 @@ NeuralNetwork <- function(data, storeID, categoryID) {
   print(paste("Neural Network for store", storeID, "category", categoryID))
   # f <- function(x) {(x-min(x))/(max(x)-min(x))}  # Is this standardization?
   # Ignore storeID since neural network requires huge amount of data
-  data %>% filter(StoreID == storeID) -> storeData
-  # data -> storeData
-  # vars <- VariableSelection(data,categoryID)
+  # allData %>% filter(StoreID == storeID) -> storeData
+  data -> storeData
+  
   storeData %>% filter(Random == 'Train') -> train
   # train <- as.data.frame(apply(temptrain[,c(3:122)],2,f)) 
   
   storeData %>% filter(Random == 'Test') -> test
   # test <- as.data.frame(apply(temptest[,c(3:122)],2,f))
-
-  # train %>% select(vars) -> trainX  # No need to cast as matrix
-  train %>% select(paste0('Y', categoryID)) -> trainY
-  train %>% select(matches('^[DPF].+$')) -> trainX
+  vars <- VariableSelection(data,categoryID)
+  train %>% select(vars) -> trainX  # No need to cast as matrix
+  test %>% select(vars) -> testX
   
-  test %>% select(matches('^[DPF].+$')) -> testX
-  # test %>% select(vars) -> testX
+  train %>% select(paste0('Y', categoryID)) -> trainY
+  # train %>% select(matches('^[DPF].+$')) -> trainX
+  # 
+  # test %>% select(matches('^[DPF].+$')) -> testX
+  
   test %>% select(paste0('Y', categoryID)) -> testY
   
   # Neural Network

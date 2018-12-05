@@ -2,8 +2,8 @@ LassoRegression <- function(data, storeID, categoryID) {
   require(glmnet)
   require(dplyr)
   print(paste("Lasso for store", storeID, "category", categoryID))
-  data %>% filter(StoreID == storeID) -> storeData
-  # data -> storeData
+  # data %>% filter(StoreID == storeID) -> storeData
+  data -> storeData
   storeData %>% filter(Random == 'Train') -> train
   storeData %>% filter(Random == 'Test') -> test
   
@@ -12,6 +12,7 @@ LassoRegression <- function(data, storeID, categoryID) {
   
   test %>% select(matches('^[DPF].$')) %>% as.matrix() -> testX
   test %>% select(paste0('Y', categoryID)) %>% as.matrix() -> testY
+  
   
   grid <- 10^seq(10,-2,length=100)
   

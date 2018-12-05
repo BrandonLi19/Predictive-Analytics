@@ -4,16 +4,22 @@ MARS <- function(data, storeID, categoryID) {
   
   print(paste("MARS for store", storeID, "category", categoryID))
   ## Ignore storeID since MARS requires huge amount of data
-  data %>% filter(StoreID == storeID) -> storeData
-  # data -> storeData
+  data -> storeData
+  
+  
   storeData %>% filter(Random == 'Train') -> train
   
   storeData %>% filter(Random == 'Test') -> test
   
-  train %>% select(matches('^[DPF].+$')) -> trainX
+  # train %>% select(matches('^[DPF].+$')) -> trainX
+  # test %>% select(matches('^[DPF].+$')) -> testX
   train %>% select(paste0('Y', categoryID)) -> trainY
   
-  test %>% select(matches('^[DPF].+$')) -> testX
+  vars <- VariableSelection(data,categoryID)
+  train %>% select(vars) -> trainX
+  test %>% select(vars) -> testX
+  
+  
   test %>% select(paste0('Y', categoryID)) -> testY
   
   ## Build model
